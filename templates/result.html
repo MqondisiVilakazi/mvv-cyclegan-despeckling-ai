@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Despeckling Result</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; }
+        .container { display: flex; justify-content: center; align-items: flex-start; gap: 20px; margin-top: 30px; }
+        .image-box { display: flex; flex-direction: column; align-items: center; border: 1px solid #ccc; padding: 10px; border-radius: 5px; width: 400px; }
+        h1, h2 { color: #333; }
+        img { width: 100%; height: 380px; object-fit: cover; }
+        table { margin: 30px auto; border-collapse: collapse; width: 600px; }
+        th, td { border: 1px solid #ddd; padding: 12px; }
+        th { background-color: #f2f2f2; }
+        a { display: inline-block; text-decoration: none; color: white; border-radius: 5px; }
+        .try-again-btn { margin-top: 30px; padding: 10px 20px; background-color: #28a745; }
+        .try-again-btn:hover { background-color: #218838; }
+
+        /* --- NEW: CSS for the download button --- */
+        .download-btn {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            font-weight: bold;
+        }
+        .download-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Result</h1>
+    <div class="container">
+        <div class="image-box">
+            <h2>Original Noisy Image</h2>
+            <img src="{{ url_for('static', filename=original_image) }}" alt="Original Image">
+        </div>
+        <div class="image-box">
+            <h2>Cleaned Image</h2>
+            <img src="{{ url_for('static', filename=result_image) }}" alt="Result Image">
+            
+            <a href="{{ url_for('static', filename=result_image) }}" download="{{ download_filename }}" class="download-btn">
+                ⬇️ Download Cleaned Image
+            </a>
+        </div>
+    </div>
+
+    {% if metrics %}
+        <h2>Validation Metrics Comparison</h2>
+        <table>
+            <tr>
+                <th>Metric</th>
+                <th>Original Noisy (vs. GT)</th>
+                <th>Cleaned Image (vs. GT)</th>
+            </tr>
+            <tr>
+                <td><strong>PSNR</strong> (Higher is Better)</td>
+                <td>{{ metrics.original_psnr }}</td>
+                <td>{{ metrics.cleaned_psnr }}</td>
+            </tr>
+            <tr>
+                <td><strong>SSIM</strong> (Closer to 1 is Better)</td>
+                <td>{{ metrics.original_ssim }}</td>
+                <td>{{ metrics.cleaned_ssim }}</td>
+            </tr>
+        </table>
+    {% else %}
+        <p style="margin-top: 20px;">Validation metrics could not be calculated (Ground Truth image not found).</p>
+    {% endif %}
+
+    <a href="/" class="try-again-btn">Clean Another Image</a>
+</body>
+</html>
